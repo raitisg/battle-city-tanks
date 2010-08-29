@@ -3,6 +3,12 @@
 
 import os, pygame, time, random, uuid
 
+class myRect(pygame.Rect):
+	""" Add type property """
+	def __init__(self, left, top, width, height, type):
+		pygame.Rect.__init__(self, left, top, width, height)
+		self.type = type
+
 class Timer(object):
 	def __init__(self):
 		self.timers = []
@@ -412,14 +418,14 @@ class Level():
 		global play_sounds, sounds
 
 		for tile in self.mapr:
-			if tile[1].topleft == pos:
-				if tile[0] == self.TILE_BRICK:
+			if tile.topleft == pos:
+				if tile.type == self.TILE_BRICK:
 					if play_sounds and sound:
 						sounds["brick"].play()
 					self.mapr.remove(tile)
 					self.updateObstacleRects()
 					return True
-				elif tile[0] == self.TILE_STEEL:
+				elif tile.type == self.TILE_STEEL:
 					if play_sounds and sound:
 						sounds["steel"].play()
 					if power == 2:
@@ -452,15 +458,15 @@ class Level():
 		for row in data:
 			for ch in row:
 				if ch == "#":
-					self.mapr.append((self.TILE_BRICK, pygame.Rect(x, y, self.TILE_SIZE, self.TILE_SIZE)))
+					self.mapr.append(myRect(x, y, self.TILE_SIZE, self.TILE_SIZE, self.TILE_BRICK))
 				elif ch == "@":
-					self.mapr.append((self.TILE_STEEL, pygame.Rect(x, y, self.TILE_SIZE, self.TILE_SIZE)))
+					self.mapr.append(myRect(x, y, self.TILE_SIZE, self.TILE_SIZE, self.TILE_STEEL))
 				elif ch == "~":
-					self.mapr.append((self.TILE_WATER, pygame.Rect(x, y, self.TILE_SIZE, self.TILE_SIZE)))
+					self.mapr.append(myRect(x, y, self.TILE_SIZE, self.TILE_SIZE, self.TILE_WATER))
 				elif ch == "%":
-					self.mapr.append((self.TILE_GRASS, pygame.Rect(x, y, self.TILE_SIZE, self.TILE_SIZE)))
+					self.mapr.append(myRect(x, y, self.TILE_SIZE, self.TILE_SIZE, self.TILE_GRASS))
 				elif ch == "-":
-					self.mapr.append((self.TILE_FROZE, pygame.Rect(x, y, self.TILE_SIZE, self.TILE_SIZE)))
+					self.mapr.append(myRect(x, y, self.TILE_SIZE, self.TILE_SIZE, self.TILE_FROZE))
 				x += self.TILE_SIZE
 			x = 0
 			y += self.TILE_SIZE
@@ -476,17 +482,17 @@ class Level():
 			tiles = [TILE_BRICK, TILE_STEEL, TILE_WATER, TILE_GRASS, TILE_FROZE]
 
 		for tile in self.mapr:
-			if tile[0] in tiles:
-				if tile[0] == self.TILE_BRICK:
-					screen.blit(self.tile_brick, tile[1].topleft)
-				elif tile[0] == self.TILE_STEEL:
-					screen.blit(self.tile_steel, tile[1].topleft)
-				elif tile[0] == self.TILE_WATER:
-					screen.blit(self.tile_water, tile[1].topleft)
-				elif tile[0] == self.TILE_FROZE:
-					screen.blit(self.tile_froze, tile[1].topleft)
-				elif tile[0] == self.TILE_GRASS:
-					screen.blit(self.tile_grass, tile[1].topleft)
+			if tile.type in tiles:
+				if tile.type == self.TILE_BRICK:
+					screen.blit(self.tile_brick, tile.topleft)
+				elif tile.type == self.TILE_STEEL:
+					screen.blit(self.tile_steel, tile.topleft)
+				elif tile.type == self.TILE_WATER:
+					screen.blit(self.tile_water, tile.topleft)
+				elif tile.type == self.TILE_FROZE:
+					screen.blit(self.tile_froze, tile.topleft)
+				elif tile.type == self.TILE_GRASS:
+					screen.blit(self.tile_grass, tile.topleft)
 
 	def updateObstacleRects(self):
 		""" Set self.obstacle_rects to all tiles' rects that players can destroy
@@ -497,8 +503,8 @@ class Level():
 		self.obstacle_rects = [castle.rect]
 
 		for tile in self.mapr:
-			if tile[0] in (self.TILE_BRICK, self.TILE_STEEL, self.TILE_WATER):
-				self.obstacle_rects.append(tile[1])
+			if tile.type in (self.TILE_BRICK, self.TILE_STEEL, self.TILE_WATER):
+				self.obstacle_rects.append(tile)
 
 	def buildFortress(self, tile):
 		""" Build walls around castle made from tile """
@@ -517,13 +523,13 @@ class Level():
 		obsolete = []
 
 		for i, rect in enumerate(self.mapr):
-			if rect[1].topleft in positions:
+			if rect.topleft in positions:
 				obsolete.append(rect)
 		for rect in obsolete:
 			self.mapr.remove(rect)
 
 		for pos in positions:
-			self.mapr.append((tile, pygame.Rect(pos, [self.TILE_SIZE, self.TILE_SIZE])))
+			self.mapr.append(myRect(pos, [self.TILE_SIZE, self.TILE_SIZE], tile))
 
 		self.updateObstacleRects()
 
