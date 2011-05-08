@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # coding=utf-8
 
-import os, pygame, time, random, uuid
+import os, pygame, time, random, uuid, sys
 
 class myRect(pygame.Rect):
 	""" Add type property """
@@ -529,7 +529,7 @@ class Level():
 			self.mapr.remove(rect)
 
 		for pos in positions:
-			self.mapr.append(myRect(pos, [self.TILE_SIZE, self.TILE_SIZE], tile))
+			self.mapr.append(myRect(pos[0], pos[1], self.TILE_SIZE, self.TILE_SIZE, tile))
 
 		self.updateObstacleRects()
 
@@ -1261,7 +1261,12 @@ class Game():
 		pygame.display.set_caption("Battle City")
 
 		size = width, height = 480, 416
-		screen = pygame.display.set_mode(size)
+
+		if "-f" in sys.argv[1:]:
+			screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
+		else:
+			screen = pygame.display.set_mode(size)
+
 		self.clock = pygame.time.Clock()
 
 		# load sprites (funky version)
@@ -1448,7 +1453,7 @@ class Game():
 		del gtimer.timers[:]
 
 		# set current stage to 0
-		self.stage = 0
+		self.stage = 1
 
 		self.animateIntroScreen()
 
@@ -1460,7 +1465,9 @@ class Game():
 				if event.type == pygame.QUIT:
 					quit()
 				elif event.type == pygame.KEYDOWN:
-					if event.key == pygame.K_UP:
+					if event.key == pygame.K_q:
+						quit()
+					elif event.key == pygame.K_UP:
 						if self.nr_of_players == 2:
 							self.nr_of_players = 1
 							self.drawIntroScreen()
@@ -1973,14 +1980,15 @@ class Game():
 					quit()
 				elif event.type == pygame.KEYDOWN and not self.game_over and self.active:
 
+					if event.key == pygame.K_q:
+						quit()
 					# toggle sounds
-					if event.key == pygame.K_m:
+					elif event.key == pygame.K_m:
 						play_sounds = not play_sounds
 						if not play_sounds:
 							pygame.mixer.stop()
 						else:
 							sounds["bg"].play(-1)
-
 
 					for player in players:
 						if player.state == player.STATE_ALIVE:
