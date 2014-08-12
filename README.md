@@ -1,7 +1,7 @@
 battle-city-tanks
 =================
 
-I always loved retro games, so I figured out why not to make one of my favorite games - BattleCity while learning Python language. I tried to make it as close as possible to original. See the [Differences] for more information where i succeeded and where I failed.
+I always loved retro games, so I figured out why not to make one of my favorite games - BattleCity while learning Python language. I tried to make it as close as possible to original. See the [[Differences from original]] for more information where i succeeded and where I failed.
 
 Screenshots
 -----------
